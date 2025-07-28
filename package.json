@@ -15,7 +15,7 @@
     "watch:tsc": "tsc -w -p tsconfig.build.json",
     "watch:tsd": "nodemon scripts/run-type-tests.ts",
     "fix:lint": "eslint . --fix",
-    "prepublishOnly": "fix:lint && npm run build && npm run test"
+    "prepublishOnly": "npm run fix:lint && npm run build && npm run test"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
