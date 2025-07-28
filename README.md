@@ -51,7 +51,7 @@ const hierarchical = nestedGroupBy(flat2DArray, {
   }
 })
 
-const firstEmployeeStartDate: string = 
+const firstEmployeeStartDate: Date = 
   hierarchical[0].offices[0].employees[0].employeeStartDate;
 
 // here's the full auto-inferred type
