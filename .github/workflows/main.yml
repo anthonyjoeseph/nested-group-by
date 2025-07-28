@@ -1,0 +1,19 @@
+name: CI
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22.17.1
+    - name: Install modules
+      run: npm i
+    - name: Build types for tsd
+      run: npm run build
+    - name: Run tests lint, tsd, jest
+      run: npm run test
