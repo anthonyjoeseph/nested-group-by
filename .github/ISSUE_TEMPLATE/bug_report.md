@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help nested-group-by behave as expected
+about: Create a report to help nested-group-by-ts behave as expected
 title: ''
 labels: ''
 assignees: ''
@@ -33,8 +33,8 @@ Which versions of fp-ts are affected by this issue? Did this work in previous ve
 
 <!-- PLEASE FILL THIS OUT -->
 
-| Software        | Version(s) |
-| --------------- | ---------- |
-| nested-group-by |            |
-| NodeJs          |            |
-| TypeScript      |            |
+| Software           | Version(s) |
+| ------------------ | ---------- |
+| nested-group-by-ts |            |
+| NodeJs             |            |
+| TypeScript         |            |

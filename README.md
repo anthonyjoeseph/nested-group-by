@@ -1,4 +1,4 @@
-# nested-group-by 🪆
+# nested-group-by-ts 🪆
 
 
 Emulates ORM-like objects & array structure without the overhead
@@ -10,7 +10,7 @@ Emulates ORM-like objects & array structure without the overhead
 ***Low Footprint*** - no dependencies, fewer than 100 lines of generated code
 
 ```ts
-import { nestedGroupBy } from 'nested-group-by';
+import { nestedGroupBy } from 'nested-group-by-ts';
 import { unprocessedBuildingData } from './database';
 
 type Building = {

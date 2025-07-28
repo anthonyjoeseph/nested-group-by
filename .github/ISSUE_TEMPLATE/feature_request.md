@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for nested-group-by
+about: Suggest an idea for nested-group-by-ts
 title: ''
 labels: ''
 assignees: ''
@@ -39,8 +39,8 @@ assignees: ''
 
 <!-- PLEASE FILL THIS OUT -->
 
-| Software        | Version(s) |
-| --------------- | ---------- |
-| nested-group-by |            |
-| NodeJs          |            |
-| TypeScript      |            |
+| Software           | Version(s) |
+| ------------------ | ---------- |
+| nested-group-by-ts |            |
+| NodeJs             |            |
+| TypeScript         |            |
