@@ -27,7 +27,7 @@ type Building = {
   employeeId: string;
   employeeStartDate: Date;
 };
-const flat2DArray: Building[] = unprocessedBuildingData();
+const flat2DArray: Building[] = await unprocessedBuildingData();
 
 const hierarchical = nestedGroupBy(flat2DArray, {
   id: "buildingId",
