@@ -1,12 +1,12 @@
 import { expectType } from "tsd";
 import { NEA } from "../src/util";
-import { hierarchical } from "./util";
+import { buildings } from "./util";
 
 expectType<
   NEA<{
     buildingAddress: string;
     janitors: {
-      janitorPhoneNumber: string | null;
+      janitorPhoneNumber: string;
     }[];
     offices: NEA<{
       officeFloorNumber: number;
@@ -15,4 +15,4 @@ expectType<
       }>;
     }>;
   }>
->(hierarchical);
+>(buildings);

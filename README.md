@@ -1,7 +1,7 @@
 # nested-group-by-ts 🪆
 
 
-Emulates ORM-like objects & array structure without the overhead
+ORM-like object structure, without the ORM
 
 ***Pure data transformation*** - performes a series of nested group-by operations.
 
@@ -11,7 +11,7 @@ Emulates ORM-like objects & array structure without the overhead
 
 ```ts
 import { nestedGroupBy } from 'nested-group-by-ts';
-import { unprocessedBuildingData } from './database';
+import { selectBuildingsFromDB } from './database';
 
 type Building = {
   buildingId: string;
@@ -27,50 +27,75 @@ type Building = {
   employeeId: string;
   employeeStartDate: Date;
 };
-const flat2DArray: Building[] = await unprocessedBuildingData();
+const flatBuildingData: Building[] = 
+  // see bottom of this README for this SQL query
+  await selectBuildingsFromDB();
 
-const hierarchical = nestedGroupBy(flat2DArray, {
-  id: "buildingId",
-  fields: ['buildingAddress'],
+export const buildings = nestedGroupBy(flatBuildingData, {
+  groupBy: ["buildingId"],
+  select: ["buildingAddress"],
   joins: {
-    // the names for 'joins' are up to you
+    // join names - 'janitors', 'offices', 'employees' -
+    // are passed along into the output
     janitors: {
-      id: "janitorId",
-      fields: ["janitorPhoneNumber"]
+      // each janitor, if they exist, should have
+      // a phone number - so, group by phone number as well
+      groupBy: ["janitorId", "janitorPhoneNumber"],
+      select: ["janitorId", "janitorPhoneNumber"],
     },
     offices: {
-      id: "officeId",
-      fields: ['officeFloorNumber'],
+      groupBy: ["officeId"],
+      select: ["officeFloorNumber"],
       joins: {
         employees: {
-          id: "employeeId",
-          fields: ['employeeStartDate']
-        }
-      }
-    }
-  }
-})
-
-const firstEmployeeStartDate: Date = 
-  hierarchical[0].offices[0].employees[0].employeeStartDate;
+          groupBy: ["employeeId"],
+          select: ["employeeStartDate"],
+        },
+      },
+    },
+  },
+});
 
 // here's the full auto-inferred type
 // NEA stands for 'non-empty-array'
-// `janitors` is potentially empty, since it's a LEFT JOIN
 
-// hierarchical: NEA<{
-//     buildingAddress: string;
-//     janitors: {
-//         janitorPhoneNumber: string | null;
-//     }[];
-//     offices: NEA<{
-//         officeFloorNumber: number;
-//         employees: NEA<{
-//             employeeStartDate: Date;
-//         }>;
+// buildings: NEA<{
+//   buildingAddress: string;
+//   janitors: {
+//     janitorPhoneNumber: string;
+//   }[];
+//   offices: NEA<{
+//     officeFloorNumber: number;
+//     employees: NEA<{
+//       employeeStartDate: Date;
 //     }>;
+//   }>;
 // }>
 ```
+
+## Type Subtleties
+
+```ts
+// Non-empty arrays
+// their `groupBy` fields are non-nullable in `type Building`
+// (in SQL, these are all INNER JOINs)
+const firstEmployeeStartDate: Date = 
+  buildings[0].offices[0].employees[0].employeeStartDate;
+
+// "Normal" array
+// 'janitorId' is nullable in `type Building`
+// (in SQL, this is a LEFT JOIN)
+const firstJanitors: { janitorPhoneNumber: string }[] =
+  buildings[0].janitors;
+
+// Phone numbers are non-nullish,
+// even though they're nullable in `type Building` (!)
+// this is because we did `group by` on both id *and* phone nuber
+const firstJanitorId: string[] = 
+  buildings[0].janitors.map(j => j.janitorPhoneNumber);
+```
+
+## Example DB Query
 
 ```ts
 // database.ts
@@ -78,7 +103,7 @@ import { Client } from 'pg';
 const client = new Client()
 await client.connect()
 
-export function unprocessedBuildingData() {
+export function selectBuildingsFromDB() {
   return client.query(`
     SELECT 
       b.id as buildingId,

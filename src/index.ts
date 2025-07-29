@@ -4,34 +4,37 @@ export type IsNonNullish<A> = null extends A ? false : undefined extends A ? fal
 
 export type ChooseArrayType<A, IsNonEmpty extends boolean> = true extends IsNonEmpty ? NEA<A> : A[];
 
-export type StringKeys<A> = keyof {
-  [K in keyof A as string extends A[K] ? K : never]: never;
-};
-
 export type NestedJoins<A> = {
-  id: StringKeys<A>;
-  fields: (keyof A)[];
+  groupBy: (keyof A)[];
+  select: (keyof A)[];
   joins?: Record<string, NestedJoins<A>>;
 };
 export type FromJoins<A, Joins extends NestedJoins<A>> = undefined extends Joins["joins"]
-  ? ChooseArrayType<{ [K in Joins["fields"][number]]: A[K] }, IsNonNullish<A[Joins["id"]]>>
+  ? ChooseArrayType<
+      {
+        [K in Joins["select"][number]]: K extends Joins["groupBy"][number] ? NonNullable<A[K]> : A[K];
+      },
+      IsNonNullish<A[Joins["groupBy"][number]]>
+    >
   : ChooseArrayType<
       {
-        [K in Joins["fields"][number] | keyof Joins["joins"]]: K extends keyof Joins["joins"]
+        [K in Joins["select"][number] | keyof Joins["joins"]]: K extends keyof Joins["joins"]
           ? FromJoins<A, NonNullable<Joins["joins"]>[K]>
-          : K extends Joins["fields"][number]
-            ? A[K]
+          : K extends Joins["select"][number]
+            ? K extends Joins["groupBy"][number]
+              ? NonNullable<A[K]>
+              : A[K]
             : never;
       },
-      IsNonNullish<A[Joins["id"]]>
+      IsNonNullish<A[Joins["groupBy"][number]]>
     >;
 
 export const nestedGroupBy = <A, Joins extends NestedJoins<A>>(a: A[], joins: Joins): FromJoins<A, Joins> => {
-  type SimplifiedJoins = { id: string; fields: string[]; joins?: Record<string, SimplifiedJoins> };
+  type SimplifiedJoins = { groupBy: string[]; select: string[]; joins?: Record<string, SimplifiedJoins> };
   const recurse = (something: Record<string, unknown>[], meta: SimplifiedJoins): any => {
-    const grouped = groupBy(something, (s) => s[meta.id] as string);
+    const grouped = groupBy(something, (s) => `${meta.groupBy.map((id) => String(s[id])).join("|")}`);
     return Object.values(grouped).map((b) => {
-      const select = pick(b[0], meta.fields);
+      const select = pick(b[0], meta.select);
       const joins = Object.fromEntries(
         Object.entries(meta.joins ?? {}).map(([customName, subMeta]) => {
           return [customName, recurse(b, subMeta)];

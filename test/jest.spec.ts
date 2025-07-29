@@ -1,9 +1,9 @@
 import * as assert from "assert";
-import { hierarchical } from "./util";
+import { buildings } from "./util";
 
 describe("transforms data", () => {
   it("returns correct values", () => {
-    assert.deepStrictEqual(hierarchical, [
+    assert.deepStrictEqual(buildings, [
       {
         buildingAddress: "123 Main St",
         janitors: [{ janitorPhoneNumber: "18005555555" }],

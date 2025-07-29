@@ -78,22 +78,21 @@ export const flat: Building[] = [
   },
 ];
 
-export const hierarchical = nestedGroupBy(flat, {
-  id: "buildingId",
-  fields: ["buildingAddress"],
+export const buildings = nestedGroupBy(flat, {
+  groupBy: ["buildingId"],
+  select: ["buildingAddress"],
   joins: {
-    // the names for 'joins' are up to you
     janitors: {
-      id: "janitorId",
-      fields: ["janitorPhoneNumber"],
+      groupBy: ["janitorId", "janitorPhoneNumber"],
+      select: ["janitorPhoneNumber"],
     },
     offices: {
-      id: "officeId",
-      fields: ["officeFloorNumber"],
+      groupBy: ["officeId"],
+      select: ["officeFloorNumber"],
       joins: {
         employees: {
-          id: "employeeId",
-          fields: ["employeeStartDate"],
+          groupBy: ["employeeId"],
+          select: ["employeeStartDate"],
         },
       },
     },
