@@ -20,7 +20,7 @@ export type FromJoins<A, Joins extends NestedJoins<A>> = undefined extends Joins
         ? ChooseArrayType<
             FromJoins<A, NonNullable<Joins["joins"]>[K]>,
             ValueOf<{
-              [G in Joins["groupBy"][number]]: IsNonNullish<A[G]>;
+              [G in NonNullable<Joins["joins"]>[K]["groupBy"][number]]: IsNonNullish<A[G]>;
             }>
           >
         : K extends Joins["select"][number]
