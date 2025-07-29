@@ -1,18 +1,36 @@
 import { expectType } from "tsd";
 import { NEA } from "../src/util";
-import { buildings } from "./util";
+import { offices, buildings, fullBuildings } from "./grouped";
+
+expectType<
+  NEA<{
+    officeFloorNumber: number;
+    employees: NEA<{
+      employeePhoneNumber: string | null;
+    }>;
+  }>
+>(offices);
 
 expectType<
   NEA<{
     buildingAddress: string;
     janitors: {
-      janitorPhoneNumber: string;
+      janitorStartDate: Date;
+    }[];
+  }>
+>(buildings);
+
+expectType<
+  NEA<{
+    buildingAddress: string;
+    janitors: {
+      janitorStartDate: Date;
     }[];
     offices: NEA<{
       officeFloorNumber: number;
       employees: NEA<{
-        employeeStartDate: Date;
+        employeePhoneNumber: string | null;
       }>;
     }>;
   }>
->(buildings);
+>(fullBuildings);

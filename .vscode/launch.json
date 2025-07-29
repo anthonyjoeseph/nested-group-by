@@ -5,11 +5,9 @@
       "name": "Debug Script",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
-
-      "args": ["src/index.ts"],
-
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [],
+      "program": "test/util.ts",
       "cwd": "${workspaceRoot}",
       "internalConsoleOptions": "openOnSessionStart",
       "skipFiles": ["<node_internals>/**", "node_modules/**"]
@@ -22,8 +20,9 @@
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
       "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "yarn",
+      "runtimeExecutable": "npm",
       "args": [
+        "run",
         "jest",
         "--runInBand",
         "--watchAll=false",

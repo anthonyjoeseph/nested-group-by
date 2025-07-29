@@ -11,47 +11,34 @@ ORM-like object structure, without the ORM
 
 ```ts
 import { nestedGroupBy } from 'nested-group-by-ts';
-import { selectBuildingsFromDB } from './database';
+import { client } from './database';
 
-type Building = {
-  buildingId: string;
-  buildingAddress: string;
-
-  // some buildings don't have a janitor
-  janitorId: string | null;
-  janitorPhoneNumber: string | null;
-  
+type Office = {
   officeId: string;
   officeFloorNumber: number;
 
   employeeId: string;
-  employeeStartDate: Date;
+  employeePhoneNumber: string | null;
 };
-const flatBuildingData: Building[] = 
-  // see bottom of this README for this SQL query
-  await selectBuildingsFromDB();
+const flatOffices: Office[] = await client.query(`
+  SELECT
+    o.id as officeId,
+    o.floor_number as officeFloorNumber,
+    e.id as employeeId,
+    e.start_date as employeeStartDate
+  FROM offices o
+  INNER JOIN employees e on e.officeId = o.id
+`);
 
-export const buildings = nestedGroupBy(flatBuildingData, {
-  groupBy: ["buildingId"],
-  select: ["buildingAddress"],
+const offices = nestedGroupBy(flatOffices, {
+  groupBy: ["officeId"],
+  select: ["officeFloorNumber"],
   joins: {
-    // join names - 'janitors', 'offices', 'employees' -
-    // are passed along into the output
-    janitors: {
-      // each janitor, if they exist, should have
-      // a phone number - so, group by phone number as well
-      groupBy: ["janitorId", "janitorPhoneNumber"],
-      select: ["janitorId", "janitorPhoneNumber"],
-    },
-    offices: {
-      groupBy: ["officeId"],
-      select: ["officeFloorNumber"],
-      joins: {
-        employees: {
-          groupBy: ["employeeId"],
-          select: ["employeeStartDate"],
-        },
-      },
+    // this join name - 'employees' - is
+    // passed along into the output
+    employees: {
+      groupBy: ["employeeId"],
+      select: ["employeePhoneNumber"],
     },
   },
 });
@@ -59,65 +46,126 @@ export const buildings = nestedGroupBy(flatBuildingData, {
 // here's the full auto-inferred type
 // NEA stands for 'non-empty-array'
 
+// employees: NEA<{
+//   officeFloorNumber: number;
+//   employees: NEA<{
+//     employeePhoneNumber: string | null;
+//   }>;
+// }>
+
+```
+
+## Left Joins
+
+Left joins tend to yield nullable values, as opposed to inner joins, whose ids are always non-nullable
+
+```ts
+type Building = {
+  buildingId: string;
+  buildingAddress: string;
+
+  // some buildings don't have a janitor
+  // thus, the LEFT JOIN
+  // that's why these values might be null
+  janitorId: string | null;
+  janitorStartDate: Date | null;
+};
+const flatBuildings: Office[] = await client.query(`
+  SELECT 
+    b.id as buildingId,
+    b.address as buildingAddress,
+    j.id as janitorId,
+    j.start_date as janitorStartDate
+  FROM buildings b
+  LEFT JOIN janitors j on j.building_id = b.id
+`);
+
+const buildings = nestedGroupBy(flatBuildings, {
+  groupBy: ["buildingId"],
+  select: ["buildingAddress"],
+  joins: {
+    janitors: {
+      // each janitor, if they exist, should have
+      // a start date - so, group by start date as well
+      groupBy: ["janitorId", "janitorStartDate"],
+      select: ["janitorStartDate"],
+    },
+  },
+});
+
+// notice that start date is non-null!
+
 // buildings: NEA<{
 //   buildingAddress: string;
 //   janitors: {
-//     janitorPhoneNumber: string;
+//     janitorStartDate: Date;
+//   }[];
+// }>
+```
+
+## Full Example
+
+```tsx
+type FullBuilding = {
+  buildingId: string;
+  buildingAddress: string;
+
+  janitorId: string | null;
+  janitorStartDate: Date | null;
+
+  officeId: string;
+  officeFloorNumber: number;
+
+  employeeId: string;
+  employeePhoneNumber: string | null;
+};
+const flatFullBuildings: Office[] = await client.query(`
+  SELECT 
+    b.id as buildingId,
+    b.address as buildingAddress,
+    j.id as janitorId,
+    j.phone_number as janitorPhoneNumber,
+    o.id as officeId,
+    o.floor_number as officeFloorNumber,
+    e.id as employeeId,
+    e.start_date as employeeStartDate
+  FROM buildings b
+  LEFT JOIN janitors j on j.building_id = b.id
+  INNER JOIN offices o on o.building_id = b.id
+  INNER JOIN employees e on e.officeId = o.id
+`);
+
+const fullBuildings = nestedGroupBy(flatFullBuildings, {
+  groupBy: ["buildingId"],
+  select: ["buildingAddress"],
+  joins: {
+    janitors: {
+      groupBy: ["janitorId", "janitorStartDate"],
+      select: ["janitorStartDate"],
+    },
+    offices: {
+      groupBy: ["officeId"],
+      select: ["officeFloorNumber"],
+      joins: {
+        employees: {
+          groupBy: ["employeeId"],
+          select: ["employeePhoneNumber"],
+        },
+      },
+    },
+  },
+});
+
+// fullBuildings: NEA<{
+//   buildingAddress: string;
+//   janitors: {
+//     janitorStartDate: Date;
 //   }[];
 //   offices: NEA<{
 //     officeFloorNumber: number;
 //     employees: NEA<{
-//       employeeStartDate: Date;
+//       employeePhoneNumber: string | null;
 //     }>;
 //   }>;
 // }>
-```
-
-## Type Subtleties
-
-```ts
-// Non-empty arrays
-// their `groupBy` fields are non-nullable in `type Building`
-// (in SQL, these are all INNER JOINs)
-const firstEmployeeStartDate: Date = 
-  buildings[0].offices[0].employees[0].employeeStartDate;
-
-// "Normal" array
-// 'janitorId' is nullable in `type Building`
-// (in SQL, this is a LEFT JOIN)
-const firstJanitors: { janitorPhoneNumber: string }[] =
-  buildings[0].janitors;
-
-// Phone numbers are non-nullish,
-// even though they're nullable in `type Building` (!)
-// this is because we did `group by` on both id *and* phone nuber
-const firstJanitorId: string[] = 
-  buildings[0].janitors.map(j => j.janitorPhoneNumber);
-```
-
-## Example DB Query
-
-```ts
-// database.ts
-import { Client } from 'pg';
-const client = new Client()
-await client.connect()
-
-export function selectBuildingsFromDB() {
-  return client.query(`
-    SELECT 
-      b.id as buildingId,
-      b.address as buildingAddress,
-      j.id as janitorId,
-      j.phone_number as janitorPhoneNumber,
-      o.id as officeId,
-      o.floor_number as officeFloorNumber,
-      e.id as employeeId,
-      e.start_date as employeeStartDate
-    FROM buildings b
-    LEFT JOIN janitors j on j.building_id = b.id
-    INNER JOIN offices o on o.building_id = b.id
-    INNER JOIN employees e on e.officeId = o.id
-  `)
-}
 ```

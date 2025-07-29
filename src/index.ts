@@ -38,7 +38,10 @@ export type FromJoins<A, Joins extends NestedJoins<A>> = undefined extends Joins
 export const nestedGroupBy = <A, Joins extends NestedJoins<A>>(a: A[], joins: Joins): FromJoins<A, Joins> => {
   type SimplifiedJoins = { groupBy: string[]; select: string[]; joins?: Record<string, SimplifiedJoins> };
   const recurse = (something: Record<string, unknown>[], meta: SimplifiedJoins): any => {
-    const grouped = groupBy(something, (s) => `${meta.groupBy.map((id) => String(s[id])).join("|")}`);
+    const grouped = groupBy(
+      something.filter((s) => !meta.groupBy.some((id) => s[id] == null || s[id] === undefined)),
+      (s) => `${meta.groupBy.map((id) => String(s[id])).join("|")}`,
+    );
     return Object.values(grouped).map((b) => {
       const select = pick(b[0], meta.select);
       const joins = Object.fromEntries(
@@ -54,8 +57,3 @@ export const nestedGroupBy = <A, Joins extends NestedJoins<A>>(a: A[], joins: Jo
   };
   return recurse(a as Record<string, unknown>[], joins as SimplifiedJoins);
 };
-
-// TODO: lines 17 and 29 should check if "any individual key"
-// is non-nullable
-// the existence of just *one* non-nullable individual group by key
-// is enough to render it a non-empty array
