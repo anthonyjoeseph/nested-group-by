@@ -2,6 +2,8 @@ import { type NEA, groupBy, pick } from "./util";
 
 export type IsNonNullish<A> = null extends A ? false : undefined extends A ? false : true;
 
+export type ValueOf<A> = A[keyof A];
+
 export type ChooseArrayType<A, IsNonEmpty extends boolean> = true extends IsNonEmpty ? NEA<A> : A[];
 
 export type NestedJoins<A> = {
@@ -14,7 +16,9 @@ export type FromJoins<A, Joins extends NestedJoins<A>> = undefined extends Joins
       {
         [K in Joins["select"][number]]: K extends Joins["groupBy"][number] ? NonNullable<A[K]> : A[K];
       },
-      IsNonNullish<A[Joins["groupBy"][number]]>
+      ValueOf<{
+        [G in Joins["groupBy"][number]]: IsNonNullish<A[G]>;
+      }>
     >
   : ChooseArrayType<
       {
@@ -26,7 +30,9 @@ export type FromJoins<A, Joins extends NestedJoins<A>> = undefined extends Joins
               : A[K]
             : never;
       },
-      IsNonNullish<A[Joins["groupBy"][number]]>
+      ValueOf<{
+        [G in Joins["groupBy"][number]]: IsNonNullish<A[G]>;
+      }>
     >;
 
 export const nestedGroupBy = <A, Joins extends NestedJoins<A>>(a: A[], joins: Joins): FromJoins<A, Joins> => {
@@ -48,3 +54,8 @@ export const nestedGroupBy = <A, Joins extends NestedJoins<A>>(a: A[], joins: Jo
   };
   return recurse(a as Record<string, unknown>[], joins as SimplifiedJoins);
 };
+
+// TODO: lines 17 and 29 should check if "any individual key"
+// is non-nullable
+// the existence of just *one* non-nullable individual group by key
+// is enough to render it a non-empty array
