@@ -12,30 +12,25 @@ export type NestedJoins<A> = {
   joins?: Record<string, NestedJoins<A>>;
 };
 export type FromJoins<A, Joins extends NestedJoins<A>> = undefined extends Joins["joins"]
-  ? ChooseArrayType<
-      {
-        [K in Joins["select"][number]]: K extends Joins["groupBy"][number] ? NonNullable<A[K]> : A[K];
-      },
-      ValueOf<{
-        [G in Joins["groupBy"][number]]: IsNonNullish<A[G]>;
-      }>
-    >
-  : ChooseArrayType<
-      {
-        [K in Joins["select"][number] | keyof Joins["joins"]]: K extends keyof Joins["joins"]
-          ? FromJoins<A, NonNullable<Joins["joins"]>[K]>
-          : K extends Joins["select"][number]
-            ? K extends Joins["groupBy"][number]
-              ? NonNullable<A[K]>
-              : A[K]
-            : never;
-      },
-      ValueOf<{
-        [G in Joins["groupBy"][number]]: IsNonNullish<A[G]>;
-      }>
-    >;
+  ? {
+      [K in Joins["select"][number]]: K extends Joins["groupBy"][number] ? NonNullable<A[K]> : A[K];
+    }
+  : {
+      [K in Joins["select"][number] | keyof Joins["joins"]]: K extends keyof Joins["joins"]
+        ? ChooseArrayType<
+            FromJoins<A, NonNullable<Joins["joins"]>[K]>,
+            ValueOf<{
+              [G in Joins["groupBy"][number]]: IsNonNullish<A[G]>;
+            }>
+          >
+        : K extends Joins["select"][number]
+          ? K extends Joins["groupBy"][number]
+            ? NonNullable<A[K]>
+            : A[K]
+          : never;
+    };
 
-export const nestedGroupBy = <A, Joins extends NestedJoins<A>>(a: A[], joins: Joins): FromJoins<A, Joins> => {
+export const nestedGroupBy = <A, Joins extends NestedJoins<A>>(a: A[], joins: Joins): FromJoins<A, Joins>[] => {
   type SimplifiedJoins = { groupBy: string[]; select: string[]; joins?: Record<string, SimplifiedJoins> };
   const recurse = (something: Record<string, unknown>[], meta: SimplifiedJoins): any => {
     const grouped = groupBy(

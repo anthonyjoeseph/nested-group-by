@@ -46,12 +46,12 @@ const offices = nestedGroupBy(flatOffices, {
 // here's the full auto-inferred type
 // NEA stands for 'non-empty-array'
 
-// employees: NEA<{
+// employees: {
 //   officeFloorNumber: number;
 //   employees: NEA<{
 //     employeePhoneNumber: string | null;
 //   }>;
-// }>
+// }[]
 
 ```
 
@@ -93,14 +93,18 @@ const buildings = nestedGroupBy(flatBuildings, {
   },
 });
 
-// notice that start date is non-null!
-
-// buildings: NEA<{
+// buildings: {
 //   buildingAddress: string;
 //   janitors: {
 //     janitorStartDate: Date;
 //   }[];
-// }>
+// }[]
+
+// ^^^
+// `janitors` is a "normal" array (not a non-empty-array)
+// because `janitorId` is nullable
+// `janitorStartDate` is non-null because we
+// grouped by start date as well
 ```
 
 ## Full Example
