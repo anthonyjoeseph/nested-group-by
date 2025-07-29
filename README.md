@@ -16,7 +16,6 @@ import { client } from './database';
 type Office = {
   officeId: string;
   officeFloorNumber: number;
-
   employeeId: string;
   employeePhoneNumber: string | null;
 };
@@ -25,8 +24,8 @@ const flatOffices: Office[] = await client.query(`
     o.id as officeId,
     o.floor_number as officeFloorNumber,
     e.id as employeeId,
-    e.start_date as employeeStartDate
-  FROM offices o
+    e.phone_number as employeePhoneNumber
+  FROM office o
   INNER JOIN employees e on e.officeId = o.id
 `);
 
@@ -34,7 +33,7 @@ const offices = nestedGroupBy(flatOffices, {
   groupBy: ["officeId"],
   select: ["officeFloorNumber"],
   joins: {
-    // this join name - 'employees' - is
+    // this custom name - 'employees' - is
     // passed along into the output
     employees: {
       groupBy: ["employeeId"],
@@ -46,7 +45,7 @@ const offices = nestedGroupBy(flatOffices, {
 // here's the full auto-inferred type
 // NEA stands for 'non-empty-array'
 
-// employees: {
+// offices: {
 //   officeFloorNumber: number;
 //   employees: NEA<{
 //     employeePhoneNumber: string | null;
@@ -57,7 +56,7 @@ const offices = nestedGroupBy(flatOffices, {
 
 ## Left Joins
 
-Left joins tend to yield nullable values, as opposed to inner joins, whose ids are always non-nullable
+Left joins tend to yield nullable values
 
 ```ts
 type Building = {
@@ -76,7 +75,7 @@ const flatBuildings: Office[] = await client.query(`
     b.address as buildingAddress,
     j.id as janitorId,
     j.start_date as janitorStartDate
-  FROM buildings b
+  FROM building b
   LEFT JOIN janitors j on j.building_id = b.id
 `);
 
@@ -107,7 +106,7 @@ const buildings = nestedGroupBy(flatBuildings, {
 // grouped by start date as well
 ```
 
-## Full Example
+## Multiple Joins
 
 ```tsx
 type FullBuilding = {
@@ -128,15 +127,15 @@ const flatFullBuildings: Office[] = await client.query(`
     b.id as buildingId,
     b.address as buildingAddress,
     j.id as janitorId,
-    j.phone_number as janitorPhoneNumber,
+    j.start_date as janitorStartDate,
     o.id as officeId,
     o.floor_number as officeFloorNumber,
     e.id as employeeId,
-    e.start_date as employeeStartDate
-  FROM buildings b
-  LEFT JOIN janitors j on j.building_id = b.id
-  INNER JOIN offices o on o.building_id = b.id
-  INNER JOIN employees e on e.officeId = o.id
+    e.phone_number as employeePhoneNumber
+  FROM building b
+  LEFT JOIN janitor j on j.building_id = b.id
+  INNER JOIN office o on o.building_id = b.id
+  INNER JOIN employee e on e.officeId = o.id
 `);
 
 const fullBuildings = nestedGroupBy(flatFullBuildings, {

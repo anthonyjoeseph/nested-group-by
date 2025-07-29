@@ -32,7 +32,10 @@ export default defineConfig([
       sourceType: "module",
       parserOptions: {},
     },
-    extends: compat.extends("plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"),
+    extends: compat.extends(
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended",
+    ),
     plugins: {
       "@typescript-eslint": typescriptEslint,
     },
@@ -41,7 +44,7 @@ export default defineConfig([
         "error",
         {
           endOfLine: "auto",
-          printWidth: 120,
+          printWidth: 90,
         },
       ],
 

@@ -3,7 +3,7 @@
     o.id as officeId,
     o.floor_number as officeFloorNumber,
     e.id as employeeId,
-    e.start_date as employeeStartDate
+    e.phone_number as employeePhoneNumber
   FROM offices o
   INNER JOIN employees e on e.officeId = o.id
  */
@@ -27,30 +27,54 @@ export const flatOffices: Office[] = [
     officeId: "OFC001",
     officeFloorNumber: 1,
     employeeId: "EMP002",
-    employeePhoneNumber: "1 (800) 555-6666",
+    employeePhoneNumber: null,
   },
   {
     officeId: "OFC002",
     officeFloorNumber: 2,
     employeeId: "EMP003",
-    employeePhoneNumber: "1 (800) 555-7777",
+    employeePhoneNumber: "1 (800) 666-5555",
   },
   {
     officeId: "OFC002",
     officeFloorNumber: 2,
     employeeId: "EMP004",
-    employeePhoneNumber: "1 (800) 555-8888",
+    employeePhoneNumber: null,
   },
   {
     officeId: "OFC003",
     officeFloorNumber: 1,
     employeeId: "EMP005",
-    employeePhoneNumber: "1 (800) 555-9999",
+    employeePhoneNumber: "1 (800) 777-5555",
   },
   {
     officeId: "OFC003",
     officeFloorNumber: 1,
     employeeId: "EMP006",
+    employeePhoneNumber: null,
+  },
+  {
+    officeId: "OFC004",
+    officeFloorNumber: 2,
+    employeeId: "EMP007",
+    employeePhoneNumber: "1 (800) 888-5555",
+  },
+  {
+    officeId: "OFC004",
+    officeFloorNumber: 2,
+    employeeId: "EMP008",
+    employeePhoneNumber: "1 (800) 888-6666",
+  },
+  {
+    officeId: "OFC004",
+    officeFloorNumber: 1,
+    employeeId: "EMP009",
+    employeePhoneNumber: "1 (800) 888-7777",
+  },
+  {
+    officeId: "OFC004",
+    officeFloorNumber: 1,
+    employeeId: "EMP010",
     employeePhoneNumber: null,
   },
 ];
@@ -86,29 +110,53 @@ export const flatBuildings: Building[] = [
     buildingId: "BUL001",
     buildingAddress: "123 Main St",
     janitorId: "JAN001",
-    janitorStartDate: new Date("2016-05-29T05:00:00.000Z"),
+    janitorStartDate: new Date("2015-05-29T05:00:00.000Z"),
+  },
+  {
+    buildingId: "BUL001",
+    buildingAddress: "123 Main St",
+    janitorId: "JAN001",
+    janitorStartDate: new Date("2015-05-29T05:00:00.000Z"),
+  },
+  {
+    buildingId: "BUL001",
+    buildingAddress: "123 Main St",
+    janitorId: "JAN001",
+    janitorStartDate: new Date("2015-05-29T05:00:00.000Z"),
   },
   {
     buildingId: "BUL002",
-    buildingAddress: "123 Main St",
+    buildingAddress: "456 Oak Blvd",
     janitorId: "JAN002",
     janitorStartDate: new Date("2016-05-29T05:00:00.000Z"),
   },
   {
     buildingId: "BUL002",
-    buildingAddress: "123 Main St",
+    buildingAddress: "456 Oak Blvd",
+    janitorId: "JAN002",
+    janitorStartDate: new Date("2016-05-29T05:00:00.000Z"),
+  },
+  {
+    buildingId: "BUL002",
+    buildingAddress: "456 Oak Blvd",
+    janitorId: "JAN002",
+    janitorStartDate: new Date("2016-05-29T05:00:00.000Z"),
+  },
+  {
+    buildingId: "BUL002",
+    buildingAddress: "456 Oak Blvd",
     janitorId: "JAN002",
     janitorStartDate: new Date("2016-05-29T05:00:00.000Z"),
   },
   {
     buildingId: "BUL003",
-    buildingAddress: "456 Oak Blvd",
+    buildingAddress: "789 Park Ave",
     janitorId: null,
     janitorStartDate: null,
   },
   {
     buildingId: "BUL003",
-    buildingAddress: "456 Oak Blvd",
+    buildingAddress: "789 Park Ave",
     janitorId: null,
     janitorStartDate: null,
   },
@@ -119,11 +167,11 @@ export const flatBuildings: Building[] = [
     b.id as buildingId,
     b.address as buildingAddress,
     j.id as janitorId,
-    j.phone_number as janitorPhoneNumber,
+    j.start_date as janitorStartDate,
     o.id as officeId,
     o.floor_number as officeFloorNumber,
     e.id as employeeId,
-    e.start_date as employeeStartDate
+    e.phone_number as employeePhoneNumber
   FROM buildings b
   LEFT JOIN janitors j on j.building_id = b.id
   INNER JOIN offices o on o.building_id = b.id

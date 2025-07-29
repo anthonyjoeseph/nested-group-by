@@ -7,7 +7,7 @@ export const offices = nestedGroupBy(flatOffices, {
   joins: {
     employees: {
       groupBy: ["employeeId"],
-      select: ["employeePhoneNumber"],
+      select: ["employeeId", "employeePhoneNumber"],
     },
   },
 });
@@ -37,7 +37,7 @@ export const fullBuildings = nestedGroupBy(flatFullBuildings, {
       joins: {
         employees: {
           groupBy: ["employeeId"],
-          select: ["employeePhoneNumber"],
+          select: ["employeeId", "employeePhoneNumber"],
         },
       },
     },

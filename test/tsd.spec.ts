@@ -6,6 +6,7 @@ expectType<
   {
     officeFloorNumber: number;
     employees: NEA<{
+      employeeId: string;
       employeePhoneNumber: string | null;
     }>;
   }[]
@@ -29,6 +30,7 @@ expectType<
     offices: NEA<{
       officeFloorNumber: number;
       employees: NEA<{
+        employeeId: string;
         employeePhoneNumber: string | null;
       }>;
     }>;
