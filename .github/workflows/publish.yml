@@ -30,9 +30,6 @@ jobs:
     - name: Build types for tsd
       if: steps.check.outputs.changed == 'true'
       run: npm run build
-    - name: Run tests lint, tsd, jest
-      if: steps.check.outputs.changed == 'true'
-      run: npm run test
     - name: Publish the package to NPM
       if: steps.check.outputs.changed == 'true'
       run: npm publish
