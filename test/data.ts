@@ -107,52 +107,10 @@ export const flatBuildings: Building[] = [
     janitorStartDate: new Date("2015-05-29T05:00:00.000Z"),
   },
   {
-    buildingId: "BUL001",
-    buildingAddress: "123 Main St",
-    janitorId: "JAN001",
-    janitorStartDate: new Date("2015-05-29T05:00:00.000Z"),
-  },
-  {
-    buildingId: "BUL001",
-    buildingAddress: "123 Main St",
-    janitorId: "JAN001",
-    janitorStartDate: new Date("2015-05-29T05:00:00.000Z"),
-  },
-  {
-    buildingId: "BUL001",
-    buildingAddress: "123 Main St",
-    janitorId: "JAN001",
-    janitorStartDate: new Date("2015-05-29T05:00:00.000Z"),
-  },
-  {
     buildingId: "BUL002",
     buildingAddress: "456 Oak Blvd",
     janitorId: "JAN002",
     janitorStartDate: new Date("2016-05-29T05:00:00.000Z"),
-  },
-  {
-    buildingId: "BUL002",
-    buildingAddress: "456 Oak Blvd",
-    janitorId: "JAN002",
-    janitorStartDate: new Date("2016-05-29T05:00:00.000Z"),
-  },
-  {
-    buildingId: "BUL002",
-    buildingAddress: "456 Oak Blvd",
-    janitorId: "JAN002",
-    janitorStartDate: new Date("2016-05-29T05:00:00.000Z"),
-  },
-  {
-    buildingId: "BUL002",
-    buildingAddress: "456 Oak Blvd",
-    janitorId: "JAN002",
-    janitorStartDate: new Date("2016-05-29T05:00:00.000Z"),
-  },
-  {
-    buildingId: "BUL003",
-    buildingAddress: "789 Park Ave",
-    janitorId: null,
-    janitorStartDate: null,
   },
   {
     buildingId: "BUL003",

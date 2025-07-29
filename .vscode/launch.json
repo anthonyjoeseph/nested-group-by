@@ -7,7 +7,7 @@
       "request": "launch",
       "runtimeExecutable": "tsx",
       "runtimeArgs": [],
-      "program": "test/util.ts",
+      "program": "test/grouped.ts",
       "cwd": "${workspaceRoot}",
       "internalConsoleOptions": "openOnSessionStart",
       "skipFiles": ["<node_internals>/**", "node_modules/**"]

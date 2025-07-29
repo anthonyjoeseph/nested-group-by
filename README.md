@@ -1,13 +1,14 @@
 # nested-group-by-ts 🪆
 
-
-ORM-like object structure, without the ORM
+Structures a flat 2D array of relational data into a hierarchical structure
 
 ***Pure data transformation*** - performes a series of nested group-by operations.
 
-***Type Safe*** - complete type inference
+***Type Safe*** - type inference intelligently decides nullability
 
 ***Low Footprint*** - no dependencies, fewer than 100 lines of generated code
+
+ORM-like object structure - without the ORM
 
 ```ts
 import { nestedGroupBy } from 'nested-group-by-ts';
@@ -37,7 +38,7 @@ const offices = nestedGroupBy(flatOffices, {
     // passed along into the output
     employees: {
       groupBy: ["employeeId"],
-      select: ["employeePhoneNumber"],
+      select: ["employeeId", "employeePhoneNumber"],
     },
   },
 });
@@ -48,6 +49,7 @@ const offices = nestedGroupBy(flatOffices, {
 // offices: {
 //   officeFloorNumber: number;
 //   employees: NEA<{
+//     employeeId: string;
 //     employeePhoneNumber: string | null;
 //   }>;
 // }[]
@@ -56,7 +58,7 @@ const offices = nestedGroupBy(flatOffices, {
 
 ## Left Joins
 
-Left joins tend to yield nullable values
+Left joins yield nullable values
 
 ```ts
 type Building = {
@@ -152,14 +154,14 @@ const fullBuildings = nestedGroupBy(flatFullBuildings, {
       joins: {
         employees: {
           groupBy: ["employeeId"],
-          select: ["employeePhoneNumber"],
+          select: ["employeeId", "employeePhoneNumber"],
         },
       },
     },
   },
 });
 
-// fullBuildings: NEA<{
+// fullBuildings: {
 //   buildingAddress: string;
 //   janitors: {
 //     janitorStartDate: Date;
@@ -167,8 +169,9 @@ const fullBuildings = nestedGroupBy(flatFullBuildings, {
 //   offices: NEA<{
 //     officeFloorNumber: number;
 //     employees: NEA<{
+//       employeeId: string;
 //       employeePhoneNumber: string | null;
 //     }>;
 //   }>;
-// }>
+// }[]
 ```
